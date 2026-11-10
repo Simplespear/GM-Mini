@@ -39,8 +39,22 @@ echo "sdk.dir=/path/to/android-sdk" > local.properties
 - 纯 Java，不引入 Kotlin；UI 以 Material 3 组件 + 代码构建为主
 - 新增协议命令放进 `Kr.java`，不要散落在 Activity 里
 - 设备读写统一走 `BleClient`，不要绕过请求队列直接 `writeCharacteristic`
-- 注释写「为什么」，不要写「是什么」；引用官方行为时标注命令字
+- 注释写「为什么」，不要写「是什么」；引用设备行为时标注命令字
 - 提交信息用中文或英文均可，建议 `fix: ...` / `feat: ...`
+
+## 签名
+
+仓库里没有 keystore。`release` 默认用构建机的 debug 证书，方便直接装机；正式发布请换成自己的：
+
+```bash
+./gradlew :app:assembleRelease \
+  -PGMMINI_STORE_FILE=/path/to/your.jks \
+  -PGMMINI_STORE_PASSWORD=store密码 \
+  -PGMMINI_KEY_ALIAS=alias \
+  -PGMMINI_KEY_PASSWORD=key密码
+```
+
+已发布的 APK 用的是构建机的 debug keystore（alias `androiddebugkey`，密码 `android`，证书 SHA-256 以 `F5:04:F6:B9` 开头）。要覆盖安装后续版本，得用同一张证书重签。
 
 ## 提交 PR
 

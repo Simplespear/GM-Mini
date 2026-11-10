@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * GM Mini 1.9 —— 基于逆向 Kr 蓝牙协议的极简手柄工具。
+ * GM Mini —— T50 手柄的极简配置工具。
  *
  * 页面结构：设备（连接 / 手柄详情 / 日志）· 宏配置 · 关于。
  * 所有弹窗统一使用 MaterialDialog，永远居于屏幕正中并带背景模糊。

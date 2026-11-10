@@ -121,11 +121,10 @@ public class BleClient {
     }
 
     /**
-     * 官方支持的设备广播名（离线内置，不依赖网络）。
-     * 来源：gamemacro.cn 的 produce/app/keyword/list 与各 project 的 btName 字段。
-     * 官方 App 每次启动都要联网拉这张表，这里直接内置，断网也能识别。
+     * 已知手柄的广播名，内置在包里，断网也能认出来。
+     * 名称来自设备广播和配对记录，不依赖任何在线接口。
      */
-    public static final String[] OFFICIAL_BT_NAMES = {
+    public static final String[] KNOWN_BT_NAMES = {
             "GameMacro",            // T50 / 本机手柄
             "Midea",
             "Thunderobot G50Plus",
@@ -174,7 +173,7 @@ public class BleClient {
         String n = name.trim().toLowerCase();
         if (n.isEmpty()) return false;
         String compact = n.replace(" ", "");
-        for (String k : OFFICIAL_BT_NAMES) {
+        for (String k : KNOWN_BT_NAMES) {
             if (n.equals(k.toLowerCase())) return true;
             if (compact.contains(k.toLowerCase().replace(" ", ""))) return true;
         }
@@ -191,7 +190,7 @@ public class BleClient {
         String n = name.trim().toLowerCase();
         if (n.isEmpty()) return false;
         String compact = n.replace(" ", "");
-        for (String k : OFFICIAL_BT_NAMES) {
+        for (String k : KNOWN_BT_NAMES) {
             if (n.equals(k.toLowerCase())) return true;
             if (compact.contains(k.toLowerCase().replace(" ", ""))) return true;
         }

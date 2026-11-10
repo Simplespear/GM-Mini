@@ -4,15 +4,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * T50 / GameMacro 键码表（权威值）。
+ * T50 键码表。
  *
- * 来源：官方配置接口
- *   GET https://gamemacro.cn/produce/app/light/detail?project=560615&type=3
- * 返回的 subActionKey / triggerKey 字段，键值为设备固件真正识别的单字节码。
+ * 键码来自手柄配置回包的逐项比对，是固件真正识别的单字节值。
  *
- * 重要：1.5 及更早版本用的是 0x01~0x14 的推测值，与固件实际键码完全不符，
- * 导致 0x37(连发) 写入被设备当作未知键丢弃、0x77 回读连发表恒为 0。
- * 本表修正后连发/宏写入才会真正落到设备。
+ * 早期版本用过 0x01~0x14 的推测值，与固件对不上，
+ * 导致 0x37（连发）写入被设备当作未知键丢弃、0x77 回读连发表恒为 0。
+ * 换成这张表后连发和宏写入才会真正落到设备。
  */
 public final class KeyCodes {
 

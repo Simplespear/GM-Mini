@@ -24,7 +24,7 @@ public final class Kr {
     public static final int ID_RECORD_MACRO_STOP = 0x47;
     public static final int ID_HEARTBEAT = 0x88;
 
-    // ---- 1.4 宏配置命令字(源自 gm_smali2 com.krly.platform.kr.request)----
+    // ---- 宏配置命令字 ----
     public static final int ID_SET_MACRO_PLATFORM = 0x36;    // SetMacroPlatformReq content[2]=(1,0) 进入宏配置模式
     public static final int ID_SET_MACRO_PROFILE_END = 0x34; // SetMacroProfileEndReq(应用收尾,无 content)
     public static final int ID_SET_VIBRATION_LEVEL = 0x35;   // SetVibrationLevelReq content[2]=左,右
@@ -63,8 +63,7 @@ public final class Kr {
 
     /**
      * 帧 = [总长][命令字][content...][SN];总长 = content.length + 3。
-     * 依据 BaseReq.getData()[B(smali:291-427):arraycopy(content,0,out,2,len),
-     * 且 SN 写在 index = content.length + 2(即帧尾)。
+     * content 从 index 2 开始拷入,SN 写在 index = content.length + 2(即帧尾)。
      */
     public static byte[] build(int id, byte[] content) {
         if (content == null) content = new byte[0];
@@ -78,7 +77,7 @@ public final class Kr {
     }
 
     public static byte[] heartbeatFrame() {
-        // krly 硬编码心跳: 04 88 01 02(len=4, id=0x88, content=[0x01], SN=0x02)
+        // 心跳固定帧: 04 88 01 02（len=4, id=0x88, content=[0x01], SN=0x02）
         return new byte[]{0x04, (byte) 0x88, 0x01, 0x02};
     }
 
@@ -361,8 +360,7 @@ public final class Kr {
     /**
      * 多帧响应重组器。响应帧布局(与请求不同!):
      * [0]=帧长 [1]=cmdId [2]=subId [3]=总帧数 [4]=当前帧号(1..总) [5..len-2]=payload [len-1]=SN
-     * 依据 QueryMacroHandleReq.completeResponse(smali:70-232):
-     *   acc += arrayLen - 6;payload 从 index 5 开始拷 arrayLen-6 个字节;
+     * 每帧累加 arrayLen - 6 字节,payload 从 index 5 开始拷;
      *   p[4] < p[3] 未完成(返回 false),p[4] == p[3] 完成(返回 true)。
      */
     public static final class Reassembler {
