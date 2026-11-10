@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_device"
+        android:icon="@drawable/ic_pad"
+        android:title="设备" />
+    <item
+        android:id="@+id/nav_macro"
+        android:icon="@drawable/ic_macro"
+        android:title="宏配置" />
+    <item
+        android:id="@+id/nav_about"
+        android:icon="@drawable/ic_info"
+        android:title="关于" />
+</menu>

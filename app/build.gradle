@@ -1,0 +1,68 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.GameMacro.mini'
+    compileSdk 34
+    // 本机只装了 build-tools 34.0.0;换机器时可以删掉这一行让它用默认版本
+    buildToolsVersion "34.0.0"
+
+    defaultConfig {
+        applicationId "com.GameMacro.mini"
+        minSdk 26
+        targetSdk 33
+        versionCode 32
+        versionName "2.9.3"
+    }
+
+    signingConfigs {
+        // 默认用 AGP 自动生成的 ~/.android/debug.keystore。
+        // 如果那台机器上写不了这个文件(公司策略 / 受控文件夹访问),
+        // 可以用 -PGMMINI_STORE_FILE=... 传自己的 keystore 覆盖 debug 签名。
+        if (project.hasProperty('GMMINI_STORE_FILE')) {
+            debug {
+                // 相对路径按工程根目录解析(便于传 keystore/debug.keystore)
+                storeFile rootProject.file(project.property('GMMINI_STORE_FILE'))
+                storePassword project.findProperty('GMMINI_STORE_PASSWORD') ?: 'android'
+                keyAlias project.findProperty('GMMINI_KEY_ALIAS') ?: 'modkey'
+                keyPassword project.findProperty('GMMINI_KEY_PASSWORD') ?: 'android'
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            // 用 debug 签名即可直接安装测试;要正式签名请改成自己的 signingConfig
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        // 源码只用 Java 8 语法(lambda 已在此基线可用)
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+        encoding = 'UTF-8'
+    }
+
+    lint {
+        abortOnError false
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+}
+
+dependencies {
+    // Material 3 组件库(自带 appcompat / cardview / recyclerview 等传递依赖)
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.11.1'
+    testImplementation 'androidx.test:core:1.5.0'
+}

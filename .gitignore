@@ -1,0 +1,26 @@
+# Gradle
+.gradle/
+build/
+**/build/
+local.properties
+gradle-app.setting
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+*.hprof
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Signing material — never commit
+*.jks
+*.keystore
+keystore.properties
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

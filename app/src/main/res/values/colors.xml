@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 品牌色 -->
+    <color name="gm_primary">#4A5BD8</color>
+    <color name="gm_on_primary">#FFFFFF</color>
+    <color name="gm_primary_container">#E0E4FF</color>
+    <color name="gm_on_primary_container">#14205A</color>
+
+    <!-- 表面与文字 -->
+    <color name="gm_surface">#F6F5FB</color>
+    <color name="gm_surface_container">#FFFFFF</color>
+    <color name="gm_surface_container_high">#FCFBFF</color>
+    <color name="gm_on_surface">#1B1B21</color>
+    <color name="gm_on_surface_variant">#5C5C70</color>
+    <color name="gm_outline">#E2DFEC</color>
+    <color name="gm_outline_variant">#EFEDF7</color>
+    <color name="gm_secondary_container">#E9E7F4</color>
+    <color name="gm_on_secondary_container">#242438</color>
+    <color name="gm_error">#B3261E</color>
+    <color name="gm_track">#EEF0FA</color>
+</resources>
