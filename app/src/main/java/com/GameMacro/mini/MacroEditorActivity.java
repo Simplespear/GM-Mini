@@ -12,7 +12,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.card.MaterialCardView;
@@ -30,7 +29,7 @@ import java.util.List;
  * 连发 / 摇杆 / 映射 / 振动 / 体感;底部 取消 / 应用。
  * 全代码 UI(与主界面一致,零资源依赖)。
  */
-public class MacroEditorActivity extends AppCompatActivity {
+public class MacroEditorActivity extends BaseActivity {
 
     public static final String EXTRA_PROFILE = "profile";
     /** 进入后直接落在哪个 tab：0 连发 / 1 摇杆 / 2 映射 / 3 振动 / 4 体感。 */
@@ -95,6 +94,11 @@ public class MacroEditorActivity extends AppCompatActivity {
     // —— 映射：{原键, 目标键, 是否被用户改过} ——
     private final List<int[]> mappings = new ArrayList<>();
     private final List<Integer> mapSupport = new ArrayList<>();
+    /** 映射页固定顺序：ZL ZR L R - + Y X B A LS RS 上 下 左 右。目标键也用这张表。 */
+    private static final int[] MAP_KEYS = {
+            0xA5, 0xA8, 0xA4, 0xA7, 0xAA, 0xAB, 0xA3, 0xA2,
+            0xA1, 0xA0, 0xA6, 0xA9, 0xD3, 0xD4, 0xD1, 0xD2
+    };
     // —— 扳机(0x77 读,展示用) ——
     private int trigLStart, trigLTerm, trigLSw, trigLThr;
     private int trigRStart, trigRTerm, trigRSw, trigRThr;
@@ -316,14 +320,7 @@ public class MacroEditorActivity extends AppCompatActivity {
         return -1;
     }
 
-    /** 默认映射键表：T50 没有 M1/M2，去掉这两个。 */
     private void resetMappings() {
-        if (mapSupport.isEmpty()) {
-            for (KeyCodes.Key k : KeyCodes.BUTTONS) {
-                if (k.code == 0x01 || k.code == 0x02) continue;
-                mapSupport.add(k.code);
-            }
-        }
         mergeMappings();
     }
 
@@ -342,12 +339,12 @@ public class MacroEditorActivity extends AppCompatActivity {
         mergeMappings();
     }
 
-    /** 重建映射表，保留用户已经改过的目标键。 */
+    /** 按固定顺序重建映射表，保留用户已经改过的目标键。 */
     private void mergeMappings() {
         java.util.Map<Integer, Integer> dirty = new java.util.HashMap<>();
         for (int[] m : mappings) if (m[2] == 1) dirty.put(m[0], m[1]);
         mappings.clear();
-        for (int code : mapSupport) {
+        for (int code : MAP_KEYS) {
             Integer t = dirty.get(code);
             mappings.add(new int[]{code, t == null ? code : t, t == null ? 0 : 1});
         }
@@ -1032,14 +1029,10 @@ public class MacroEditorActivity extends AppCompatActivity {
         return c;
     }
 
-    /** 映射目标候选：设备 0x86/sub=2 上报的键优先，再补齐标准按键（含 - / +）。 */
+    /** 映射目标候选：和源键同一张表、同一顺序。 */
     private java.util.List<Integer> targetKeys() {
         java.util.List<Integer> out = new ArrayList<>();
-        for (int c : mapSupport) if (!out.contains(c)) out.add(c);
-        for (KeyCodes.Key k : KeyCodes.BUTTONS) {
-            if (k.code == 0x01 || k.code == 0x02) continue;   // T50 没有 M1/M2
-            if (!out.contains(k.code)) out.add(k.code);
-        }
+        for (int c : MAP_KEYS) out.add(c);
         return out;
     }
 
@@ -1108,15 +1101,25 @@ public class MacroEditorActivity extends AppCompatActivity {
 
     private void buildVibPage() {
         label(pageBox, "振动设置", COLOR_TEXT, 16, true);
-        label(pageBox, "四档调节，点 − / + 时手柄会试振", COLOR_SUB, 11, false);
 
         LinearLayout card = card();
         addVibLevelRow(card, "左振动", true);
         divider(card);
         addVibLevelRow(card, "右振动", false);
+        label(card, "档位随「应用」写入手柄", COLOR_SUB, 10, false)
+                .setPadding(dp(2), dp(8), 0, dp(2));
 
-        label(card, "档位随「应用」写入手柄；试振只震动一下，不改已保存设置",
-                COLOR_SUB, 10, false).setPadding(dp(2), dp(8), 0, dp(2));
+        MaterialButton test = mkBtn("试振", true);
+        test.setOnClickListener(v -> {
+            vibrateTest();
+            if (ble != null && ble.isConnected()) {
+                Toast.makeText(this, "已发送试振", Toast.LENGTH_SHORT).show();
+            }
+        });
+        LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(44));
+        tlp.topMargin = dp(10);
+        pageBox.addView(test, tlp);
     }
 
     /** 原版振动页：四颗星 + 减/加，点一下立刻试振。 */
@@ -1132,6 +1135,9 @@ public class MacroEditorActivity extends AppCompatActivity {
         title.setTextColor(COLOR_TEXT);
         row.addView(title, new LinearLayout.LayoutParams(0,
                 LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        MaterialButton minus = vibStepBtn("−");
+        row.addView(minus, new LinearLayout.LayoutParams(dp(34), dp(34)));
 
         final int[] level = {vibLevel(left ? vibL : vibR)};
         final TextView[] stars = new TextView[4];
@@ -1150,14 +1156,12 @@ public class MacroEditorActivity extends AppCompatActivity {
                 }
             });
             stars[i] = star;
-            row.addView(star, new LinearLayout.LayoutParams(dp(26), dp(36)));
+            LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(dp(26), dp(36));
+            if (i == 0) slp.leftMargin = dp(8);
+            row.addView(star, slp);
         }
 
-        MaterialButton minus = vibStepBtn("−");
         MaterialButton plus = vibStepBtn("+");
-        LinearLayout.LayoutParams mlp = new LinearLayout.LayoutParams(dp(34), dp(34));
-        mlp.leftMargin = dp(8);
-        row.addView(minus, mlp);
         LinearLayout.LayoutParams plp = new LinearLayout.LayoutParams(dp(34), dp(34));
         plp.leftMargin = dp(6);
         row.addView(plus, plp);
@@ -1531,7 +1535,7 @@ public class MacroEditorActivity extends AppCompatActivity {
         byte[] frame = (byte[]) step[0];
         int expectId = (Integer) step[1];
         String what = (String) step[2];
-        status("(" + (i + 1) + "/" + chain.size() + ") " + what + " → " + Kr.hex(frame));
+        status("正在写入 " + (i + 1) + "/" + chain.size());
         awaitingId = expectId;
         ble.write(frame);
         // 超时兜底:900ms 内没收到 ACK 也继续下一条(token 防止旧超时误推进,连发场景多条 0x37 同 id)

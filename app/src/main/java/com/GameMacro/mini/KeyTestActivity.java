@@ -8,7 +8,6 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.InputDevice;
@@ -33,7 +32,7 @@ import java.util.List;
  *
  * 官方把 6 个命令号都映射到 TestModeEventRsp，不同型号走不同的一条，这里全监听。
  */
-public class KeyTestActivity extends AppCompatActivity {
+public class KeyTestActivity extends BaseActivity {
 
     // 官方 KeyEvent 位
     private static final long B_A = 1L, B_B = 2L, B_X = 4L, B_Y = 8L;
@@ -142,9 +141,7 @@ public class KeyTestActivity extends AppCompatActivity {
     // ---------------- 输入事件兜底 ----------------
 
     private static boolean fromPad(KeyEvent e) {
-        int s = e.getSource();
-        return (s & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD
-                || (s & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK;
+        return fromPad(e.getDeviceId(), e.getSource());
     }
 
     private static long bitForKey(int code) {

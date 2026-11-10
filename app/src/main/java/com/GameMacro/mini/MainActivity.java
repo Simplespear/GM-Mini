@@ -30,8 +30,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
@@ -39,6 +39,11 @@ import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,7 +55,7 @@ import java.util.Map;
  * 页面结构：设备（连接 / 手柄详情 / 日志）· 宏配置 · 关于。
  * 所有弹窗统一使用 MaterialDialog，永远居于屏幕正中并带背景模糊。
  */
-public class MainActivity extends AppCompatActivity implements BleClient.Listener {
+public class MainActivity extends BaseActivity implements BleClient.Listener {
 
     private static final int REQ_PERM = 1001;
 
@@ -973,6 +978,21 @@ public class MainActivity extends AppCompatActivity implements BleClient.Listene
         ver.setPadding(0, dp(2), 0, 0);
         bInfo.addView(ver);
 
+        MaterialButton check = new MaterialButton(this, null,
+                com.google.android.material.R.attr.materialButtonOutlinedStyle);
+        check.setText("检查更新");
+        check.setTextSize(13.5f);
+        check.setAllCaps(false);
+        check.setCornerRadius(dp(23));
+        check.setTextColor(C_PRIMARY);
+        check.setInsetTop(0);
+        check.setInsetBottom(0);
+        LinearLayout.LayoutParams chkLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(44));
+        chkLp.topMargin = dp(12);
+        verCard.addView(check, chkLp);
+        check.setOnClickListener(v -> checkUpdate(check));
+
         sectionTitle(col, "支持的手柄");
         LinearLayout padCard = card(col);
 
@@ -1038,8 +1058,83 @@ public class MainActivity extends AppCompatActivity implements BleClient.Listene
         try {
             return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (Exception e) {
-            return "2.9.3";
+            return "3.0";
         }
+    }
+
+    private static final String RELEASE_API =
+            "https://api.github.com/repos/Simplespear/GM-Mini/releases/latest";
+    private static final String RELEASE_PAGE =
+            "https://github.com/Simplespear/GM-Mini/releases";
+
+    /** 拉 GitHub 最新的 release tag，比当前 versionName 新就打开浏览器。 */
+    private void checkUpdate(MaterialButton btn) {
+        btn.setEnabled(false);
+        btn.setText("检查中…");
+        new Thread(() -> {
+            String tag = null;
+            String link = RELEASE_PAGE;
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) new URL(RELEASE_API).openConnection();
+                conn.setConnectTimeout(8000);
+                conn.setReadTimeout(8000);
+                conn.setRequestProperty("Accept", "application/vnd.github+json");
+                conn.setRequestProperty("User-Agent", "GMMini");
+                if (conn.getResponseCode() == 200) {
+                    StringBuilder sb = new StringBuilder();
+                    try (BufferedReader r = new BufferedReader(
+                            new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                        String line;
+                        while ((line = r.readLine()) != null) sb.append(line);
+                    }
+                    org.json.JSONObject o = new org.json.JSONObject(sb.toString());
+                    tag = o.optString("tag_name", "");
+                    String html = o.optString("html_url", "");
+                    if (!html.isEmpty()) link = html;
+                }
+            } catch (Exception ignored) {
+            } finally {
+                if (conn != null) conn.disconnect();
+            }
+            final String found = tag;
+            final String url = link;
+            runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                btn.setEnabled(true);
+                btn.setText("检查更新");
+                if (found == null || found.isEmpty()) {
+                    Toast.makeText(this, "检查失败，请稍后再试", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (newerThan(found, appVersion())) {
+                    Toast.makeText(this, "发现新版本 " + found, Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url)));
+                } else {
+                    Toast.makeText(this, "已是最新版本", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }).start();
+    }
+
+    private static boolean newerThan(String remote, String current) {
+        int[] a = versionParts(remote);
+        int[] b = versionParts(current);
+        for (int i = 0; i < Math.max(a.length, b.length); i++) {
+            int x = i < a.length ? a[i] : 0;
+            int y = i < b.length ? b[i] : 0;
+            if (x != y) return x > y;
+        }
+        return false;
+    }
+
+    private static int[] versionParts(String s) {
+        String[] p = s.replaceAll("[^0-9.]", "").split("\\.");
+        int[] out = new int[p.length];
+        for (int i = 0; i < p.length; i++) {
+            try { out[i] = Integer.parseInt(p[i]); } catch (Exception e) { out[i] = 0; }
+        }
+        return out;
     }
 
     // ---------------- 底部导航 ----------------

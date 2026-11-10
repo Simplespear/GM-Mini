@@ -12,7 +12,6 @@ import android.graphics.drawable.RippleDrawable;
 import android.graphics.pdf.PdfRenderer;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.ParcelFileDescriptor;
@@ -46,7 +45,7 @@ import java.util.concurrent.Executors;
  *   · assets 里的 PDF 先复制到 cache（文件名带 lastUpdateTime，App 升级自动换新），
  *     PdfRenderer 需要真实文件描述符，不能直接读 asset 流。
  */
-public class ManualActivity extends AppCompatActivity {
+public class ManualActivity extends BaseActivity {
 
     private static final String ASSET = "manual/t50.pdf";
 

@@ -20,24 +20,24 @@ public final class KeyCodes {
         public Key(int code, String name) { this.code = code; this.name = name; }
     }
 
-    /** 物理按键（连发页可编辑项）。顺序沿用官方连发 tab：ABXY / 肩键 / 扳机 / 菜单 / 十字 / 背键 */
+    /** 物理按键。名称按手柄丝印：L/R 肩键，ZL/ZR 扳机，LS/RS 摇杆按下。 */
     public static final Key[] BUTTONS = {
             new Key(0xA0, "A"),
             new Key(0xA1, "B"),
             new Key(0xA2, "X"),
             new Key(0xA3, "Y"),
-            new Key(0xA4, "L1"),
-            new Key(0xA7, "R1"),
-            new Key(0xA5, "L2"),
-            new Key(0xA8, "R2"),
-            new Key(0xA6, "L3"),
-            new Key(0xA9, "R3"),
+            new Key(0xA4, "L"),
+            new Key(0xA7, "R"),
+            new Key(0xA5, "ZL"),
+            new Key(0xA8, "ZR"),
+            new Key(0xA6, "LS"),
+            new Key(0xA9, "RS"),
             new Key(0xAA, "-"),
             new Key(0xAB, "+"),
-            new Key(0xD3, "十字上"),
-            new Key(0xD4, "十字下"),
-            new Key(0xD1, "十字左"),
-            new Key(0xD2, "十字右"),
+            new Key(0xD3, "上"),
+            new Key(0xD4, "下"),
+            new Key(0xD1, "左"),
+            new Key(0xD2, "右"),
             new Key(0x01, "M1"),
             new Key(0x02, "M2"),
     };
@@ -48,14 +48,14 @@ public final class KeyCodes {
      */
     public static final Key[] ALL = {
             new Key(0xA0, "A"), new Key(0xA1, "B"), new Key(0xA2, "X"), new Key(0xA3, "Y"),
-            new Key(0xA4, "L1"), new Key(0xA5, "L2"), new Key(0xA6, "L3"),
-            new Key(0xA7, "R1"), new Key(0xA8, "R2"), new Key(0xA9, "R3"),
+            new Key(0xA4, "L"), new Key(0xA5, "ZL"), new Key(0xA6, "LS"),
+            new Key(0xA7, "R"), new Key(0xA8, "ZR"), new Key(0xA9, "RS"),
             new Key(0xAA, "-"), new Key(0xAB, "+"), new Key(0xAE, "i/turbo"),
             new Key(0x01, "M1"), new Key(0x02, "M2"),
 
             new Key(0xD0, "十字·中"),
-            new Key(0xD1, "十字左"), new Key(0xD2, "十字右"),
-            new Key(0xD3, "十字上"), new Key(0xD4, "十字下"),
+            new Key(0xD1, "左"), new Key(0xD2, "右"),
+            new Key(0xD3, "上"), new Key(0xD4, "下"),
             new Key(0xD5, "十字左上"), new Key(0xD6, "十字右上"),
             new Key(0xD7, "十字左下"), new Key(0xD8, "十字右下"),
 

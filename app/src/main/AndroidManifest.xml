@@ -14,6 +14,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="30" />
 
+    <!-- 检查更新：只访问 GitHub 的 release 接口，没有别的联网行为 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
 
     <application

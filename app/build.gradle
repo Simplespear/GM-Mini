@@ -12,8 +12,8 @@ android {
         applicationId "com.GameMacro.mini"
         minSdk 26
         targetSdk 33
-        versionCode 32
-        versionName "2.9.3"
+        versionCode 33
+        versionName "3.0"
     }
 
     signingConfigs {

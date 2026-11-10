@@ -1,6 +1,6 @@
-# GMMini 2.9.3 源码与构建说明
+# GMMini 3.0 源码与构建说明
 
-本包是 **GMMini 2.9.3** 的 Android Studio / Gradle 工程源码。界面基于
+本包是 **GMMini 3.0** 的 Android Studio / Gradle 工程源码。界面基于
 **AndroidX AppCompat + Material Components 1.9.0**，主界面、宏编辑器、弹窗与提示
 均为 Material 3 组件；本版修复取消配对残留、锁定竖屏、摇杆测试触顶，并以 MIT
 许可证开源。
@@ -11,7 +11,7 @@
 |---|---|
 | 包名（applicationId / namespace） | `com.GameMacro.mini`（未变） |
 | APP 名称 | `GM Mini`（未变） |
-| versionName / versionCode | `2.9.3` / `32` |
+| versionName / versionCode | `3.0` / `33` |
 | 编译 | AGP 8.1.4 + Gradle 8.2，compileSdk 34，build-tools 34.0.0，minSdk 26，targetSdk 33 |
 | 依赖 | `androidx.appcompat:appcompat:1.6.1`、`com.google.android.material:material:1.9.0` |
 | 语言 | 纯 Java 8 |
@@ -146,7 +146,7 @@ sdk.dir=/path/to/Android/sdk
 `./gradlew clean assembleRelease` 通过；APK 元数据：
 
 ```
-package: name='com.GameMacro.mini' versionCode='32' versionName='2.9.3'
+package: name='com.GameMacro.mini' versionCode='33' versionName='3.0'
 application-label:'GM Mini'
 launchable-activity: name='com.GameMacro.mini.MainActivity'
 Signer #1 certificate SHA-256: f504f6b95db46f6c28847dfcfcd81d0523baa4f7277334c465784e0780c91bdc
