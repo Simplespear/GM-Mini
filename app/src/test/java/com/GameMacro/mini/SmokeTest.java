@@ -99,6 +99,33 @@ public class SmokeTest {
         }
     }
 
+    /** 手柄按键不能操作界面：方向键和 A 键在 Activity 层就该被吃掉。 */
+    @Test public void padKeysDoNotReachUi() {
+        ActivityController<MainActivity> c = Robolectric.buildActivity(MainActivity.class).setup();
+        MainActivity a = c.get();
+        long t = android.os.SystemClock.uptimeMillis();
+        android.view.KeyEvent dpad = new android.view.KeyEvent(t, t,
+                android.view.KeyEvent.ACTION_DOWN, android.view.KeyEvent.KEYCODE_DPAD_DOWN,
+                0, 0, 0, 0, 0, android.view.InputDevice.SOURCE_GAMEPAD);
+        org.junit.Assert.assertTrue("手柄方向键应该被拦截", a.dispatchKeyEvent(dpad));
+        android.view.KeyEvent buttonA = new android.view.KeyEvent(t, t,
+                android.view.KeyEvent.ACTION_DOWN, android.view.KeyEvent.KEYCODE_BUTTON_A,
+                0, 0, 0, 0, 0, android.view.InputDevice.SOURCE_GAMEPAD);
+        org.junit.Assert.assertTrue("手柄 A 键应该被拦截", a.dispatchKeyEvent(buttonA));
+        c.pause().stop().destroy();
+    }
+
+    /** 检查更新的版本比较：v3.0 比 2.9.3 新，v3.0 不比 3.0 新。 */
+    @Test public void versionCompare() throws Exception {
+        java.lang.reflect.Method m =
+                MainActivity.class.getDeclaredMethod("newerThan", String.class, String.class);
+        m.setAccessible(true);
+        org.junit.Assert.assertTrue((Boolean) m.invoke(null, "v3.1", "3.0"));
+        org.junit.Assert.assertTrue((Boolean) m.invoke(null, "v3.0", "2.9.3"));
+        org.junit.Assert.assertFalse((Boolean) m.invoke(null, "v3.0", "3.0"));
+        org.junit.Assert.assertFalse((Boolean) m.invoke(null, "v2.9.9", "3.0"));
+    }
+
     /** GameMacro 只是协议名，Pocket Controller 才是系统里的手柄名，解绑时按同一系列处理。 */
     @Test public void controllerNameFamilyCoversBothNames() {
         org.junit.Assert.assertTrue(BleClient.sameModelFamily("GameMacro", "Pocket Controller"));
